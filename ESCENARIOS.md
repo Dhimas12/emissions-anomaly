@@ -12,8 +12,8 @@ repositorio.
 
 ### Lo primero: el sistema no se equivocó
 
-25.000 kWh son el doble de la línea base de Madrid. Estadísticamente **es** una anomalía y
-marcarla fue correcto. Lo que falló no es la detección, sino que no había forma de que el
+25.000 kWh son casi el doble de la línea base de Madrid. Estadísticamente **es** una anomalía
+y marcarla fue correcto. Lo que falló no es la detección, sino que no había forma de que el
 sistema supiera algo que solo existía en la cabeza del cliente.
 
 Bajar el umbral para que este caso no salte sería resolver el síntoma rompiendo la
@@ -22,28 +22,46 @@ unidades. **No cambiaría el algoritmo. Cambiaría lo que el algoritmo sabe.**
 
 ### Y los datos ya traen la pista
 
-Pasando ese registro por la API, junto a los tres meses sanos de Madrid:
+Pasando ese registro por la API, con el histórico real de Madrid:
 
 | Regla | Resultado | Evidencia |
 |---|---|---|
-| RF-03 · consumo | **Anomaly** | mediana 12.500 · MAD 300 · z = 28,10 · desviación **+100 %** |
-| RF-04a · banda física | Passed | intensidad 0,236, dentro de 0,05–0,80 |
-| RF-04b · histórico de la sede | **Passed** | 0,236 frente a una mediana de 0,232 · desviación **+1,7 %** |
+| RF-03 · consumo | **Anomaly · Low** | mediana 12.650 · MAD 400 · z = **20,83** · desviación **+97,6 %** |
+| RF-04a · banda física | Passed | intensidad 0,2360, dentro de 0,05–0,80 |
+| RF-04b · histórico de la sede | **Passed** | 0,2360 frente a una mediana de 0,2312 · desviación **+2,06 %** |
 
-La intensidad de carbono es `5.900 / 25.000 = 0,236 kg CO₂/kWh`, frente a los 0,232
-históricos de Madrid: un 1,7 % de diferencia contra una tolerancia del 40 %.
+La intensidad de carbono es `5.900 / 25.000 = 0,2360 kg CO₂/kWh` frente a los 0,2312
+históricos de Madrid: un **2,06 %** contra una tolerancia del 40 %.
 
-**Salta RF-03 y no salta RF-04, y esa combinación es la firma del crecimiento real.** Una
+**Salta RF-03 y no salta RF-04, y esa combinación es la firma del crecimiento legítimo.** Una
 sede que produce más consume más manteniendo su factor de emisión; un dato corrupto rompe la
 relación. Por eso volumen e intensidad son señales separadas y nunca se combinan en una
 puntuación única (ADR-04): la combinación de reglas que disparan **ya es información de
-negocio**. El test `CarbonIntensityRuleTests.RF04b_IdCuatroEscalaConsumoYEmisiones_NoSeMarca`
-es exactamente este razonamiento aplicado al id 4 del dataset.
+negocio**.
 
-Consecuencia práctica inmediata: el sistema no clasifica este caso como grave. Le asigna
-severidad **Medium**, no `High`, porque la desviación es del 100 % y no del 200 %. En la
-bandeja del analista no aparece como "probable error" sino como "cambio a confirmar", que es
-lo que es.
+### Y además lo clasifica bien, sin saber nada de la ampliación
+
+El sistema no se limita a detectarlo: le asigna severidad **`Low`**, la más baja que existe.
+La desviación es del **97,6 %** y el umbral que separa `Low` de `Medium` está en el 100 %, así
+que pasa **2,37 puntos por debajo**. En la bandeja del analista, este caso aparece como la
+alerta *menos* urgente de la cola.
+
+Y sale de la aritmética, no de una excepción metida a mano. El patrón completo —RF-03
+disparando con la severidad mínima y RF-04 pasando limpiamente— es lo que distingue el
+crecimiento real de un dato corrupto, y el motor lo produce sin conocer el contexto del
+negocio. La respuesta no es solo "no cambiaría el algoritmo": es que **el algoritmo ya está
+diciendo que este caso merece menos atención que una anomalía de verdad**.
+
+Un detalle que conviene conocer: la línea base incluye el mes de abril, el de 79.000 kWh. Ese
+registro es estructuralmente válido —solo es estadísticamente extremo—, así que RN-01 no lo
+excluye y sube la mediana de 12.500 a 12.650 y el MAD de 300 a 400. Es lo que acerca a mayo
+al umbral del 100 %. En un sistema con el registro de eventos de sede del punto 1, abril
+habría quedado resuelto por un analista antes de que llegase mayo.
+
+El comportamiento está fijado por
+`EscenariosTests.EscenarioA_CrecimientoLegitimo_DisparaConsumoBajoYNoIntensidad`, con los
+cuatro números en el propio test: si alguien recalibra un umbral, esta respuesta deja de ser
+un documento que se desfasa en silencio.
 
 ### Cómo evitar falsos positivos como este
 

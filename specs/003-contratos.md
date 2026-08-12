@@ -67,6 +67,7 @@ emissions-anomaly/
         ├── CarbonIntensityRuleTests.cs
         ├── AnomalyDetectionEngineTests.cs
         ├── AcceptanceTests.cs
+        ├── EscenariosTests.cs          (fija los números de ESCENARIOS.md)
         ├── SampleDataset.cs            (dataset del enunciado como fixture)
         └── SampleDatasetTests.cs       (humo de T0, exigido por 006 T-CI-2)
 ```
