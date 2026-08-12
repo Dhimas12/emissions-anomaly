@@ -162,8 +162,16 @@ la respuesta al Escenario B.
 | `MinCarbonIntensity`             | 0,05  | por debajo, o falta CO₂ imputado o la energía no es de red           |
 | `MaxCarbonIntensity`             | 0,80  | por encima del factor de emisión de casi cualquier red eléctrica      |
 | `IntensityRelativeTolerance`     | 0,40  | holgura para cambios reales de mix; por encima, algo cambió          |
-| `HighSeverityRelativeDeviation`  | 2,0   | desviación ≥200 % ⇒ severidad alta                                    |
-| `MediumSeverityRelativeDeviation`| 1,0   | desviación ≥100 % ⇒ severidad media                                   |
+| `HighSeverityRelativeDeviation`  | 2,0   | desviación de **consumo** ≥200 % ⇒ severidad alta                     |
+| `MediumSeverityRelativeDeviation`| 1,0   | desviación de **consumo** ≥100 % ⇒ severidad media                    |
+| `IntensityHighSeverityDeviation` | 1,0   | desviación de **intensidad** ≥100 % ⇒ severidad alta                  |
+| `IntensityMediumSeverityDeviation`| 0,7  | desviación de **intensidad** ≥70 % ⇒ severidad media                  |
+
+Las dos últimas existen porque la intensidad tiene su propia escala y no la de volumen.
+El factor de emisión de una sede es estable mientras no cambie el mix energético, así que
+duplicarlo ya es una señal fuerte; el consumo, en cambio, sube y baja con la actividad y
+necesita triplicarse para decir lo mismo. Reutilizar los umbrales de RF-03 en RF-04b
+mezclaría dos magnitudes que ADR-04 separa a propósito.
 
 **Consecuencia importante y buscada:** `MinimumBaselineSize = 3` con base
 *leave-one-out* implica que Barcelona (3 válidos ⇒ base de 2) y Valencia (2
