@@ -89,6 +89,38 @@ public sealed class ConsumptionDeviationRuleTests
             ToleranciaTablaRf03);
     }
 
+    // El test que documenta ADR-02, y el único que distingue la doble condición de un
+    // criterio puramente estadístico. Con base [12000, 12500, 12800] la mediana es 12.500
+    // y el MAD 300, así que 15.000 kWh da:
+    //
+    //     z   = 0,6745 × (15000 − 12500) / 300 = 5,6208   →  supera 3,5 con holgura
+    //     rel = (15000 − 12500) / 12500        = 0,20     →  no llega al 25 %
+    //
+    // El z-score dice que sí y la materialidad dice que no, y no se marca. Comprobado por
+    // mutación: al sustituir la doble condición por `if (!extremo)` caen este test y el de
+    // serie constante, y solo esos dos. Ningún caso del dataset del enunciado lo detecta,
+    // porque todos fallan las dos condiciones a la vez o cumplen las dos.
+    //
+    // Un +20 % mensual en energía lo explican el clima o el calendario laboral sin
+    // necesidad de sospechar del dato.
+    [Fact]
+    public void RN03_DesviacionExtremaPeroInmaterial_NoSeMarca()
+    {
+        var (historia, evaluado) = Escenario(15000, 12000, 12500, 12800);
+
+        var baseline = historia.BaselineExcluding(evaluado, r => r.EnergyKwh);
+        var mediana = RobustStatistics.Median(baseline);
+        var mad = RobustStatistics.MedianAbsoluteDeviation(baseline, mediana);
+
+        // Las dos mitades del criterio, visibles y verificables a mano.
+        Assert.Equal(5.6208, RobustStatistics.ModifiedZScore(15000, mediana, mad)!.Value, Tolerance);
+        Assert.True(Math.Abs(RobustStatistics.ModifiedZScore(15000, mediana, mad)!.Value) > 3.5);
+        Assert.Equal(0.20, RobustStatistics.RelativeDeviation(15000, mediana)!.Value, Tolerance);
+        Assert.False(Math.Abs(RobustStatistics.RelativeDeviation(15000, mediana)!.Value) > 0.25);
+
+        Assert.Equal(RuleOutcome.Passed, Evaluar(historia, evaluado).Outcome);
+    }
+
     // RF-06: con dos puntos de base no se infiere ninguna normalidad. No se marca, pero
     // tampoco se afirma que el consumo sea correcto.
     [Fact]
