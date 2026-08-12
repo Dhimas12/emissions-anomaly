@@ -282,10 +282,31 @@ esperando un check que ya no existe y bloquea todos los PRs.
    (`TreatWarningsAsErrors`).
 3. Antes de T12, el job `acceptance` pasa en verde indicando que el gate está
    omitido.
-4. Desde T12, si se altera un umbral de `appsettings.json` de forma que el id 4
-   deje de marcarse, el job `acceptance` falla.
+4. Desde T12, una deriva de umbral en `appsettings.json` **bloquea el PR**. La caza
+   `ApiConfigurationTests` dentro de `build-and-test`, comparando cada valor del
+   fichero con el valor por defecto de `AnomalyDetectionOptions`, y como `acceptance`
+   depende de ese job, el gate queda en `skipped` sin llegar a arrancar.
+   Comprobado subiendo `MaxCarbonIntensity` a 1,0: el id 8 deja de marcarse,
+   `build-and-test` termina en rojo y `acceptance` no se ejecuta.
 5. Tras mezclar en `main`, el pipeline se ejecuta de nuevo sobre `main` y termina
    en verde.
 
-El punto 4 es la prueba de que el gate sirve para algo: si se puede romper el
-criterio de negocio sin que el CI se entere, el CI está decorando.
+### Por qué el orden de los dos jobs es deliberado
+
+Las dos capas cubren cosas distintas y no se solapan.
+
+**Una deriva de configuración se detecta en `build-and-test`**, en menos de un minuto y
+sin levantar la API. Reservar esa detección al gate sería pagar un arranque completo,
+un sondeo y cuatro peticiones por algo que un test unitario ya sabe. Que `acceptance`
+quede en `skipped` no es una laguna: el PR está bloqueado igualmente por RN-CI-01.
+
+**El gate `acceptance` cubre lo que ningún test de `Emissions.Analysis` puede ver.** El
+motor no conoce el transporte —esa es la decisión estructural de `002` §1—, así que
+ninguna de sus pruebas se entera de que una ruta cambió, de que la serialización dejó
+de ser `camelCase`, de que las severidades salen como número en vez de como cadena o de
+que la API no levanta. Ahí el gate es la única red, y por eso sigue teniendo sentido
+aunque casi nunca sea el primero en ponerse rojo.
+
+Dicho de otro modo: si se pudiera romper el criterio de negocio sin que el CI se
+enterase, el CI estaría decorando. La comprobación anterior demuestra que se entera —
+solo que se entera antes de lo que este documento suponía.

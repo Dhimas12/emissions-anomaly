@@ -90,7 +90,7 @@ antes de empezar la siguiente. Marcar `[x]` al terminar.
   *Hecho cuando:* `curl localhost:5080/api/v1/analysis/sample` reproduce la tabla
   de aceptación.
 
-- [ ] **T13 · README.md**
+- [x] **T13 · README.md**
   Breve. Debe contener: qué hace, cómo ejecutarlo (build, test, run, un `curl` de
   ejemplo), el criterio de detección resumido en un párrafo por regla con su
   justificación, la tabla de resultados sobre el dataset, la sección de escalado a
