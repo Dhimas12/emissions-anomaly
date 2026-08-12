@@ -245,7 +245,7 @@ esperando un check que ya no existe y bloquea todos los PRs.
 
 ## 6. Tareas
 
-- [ ] **T-CI-1 · Workflow y plantilla de PR**
+- [x] **T-CI-1 · Workflow y plantilla de PR**
   Crear `.github/workflows/ci.yml` y `.github/pull_request_template.md` según §3.
   *Hecho cuando:* el workflow aparece en la pestaña Actions y el job
   `build-and-test` termina en verde con el gate de aceptación omitido.
