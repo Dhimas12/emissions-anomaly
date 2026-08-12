@@ -36,7 +36,7 @@ antes de empezar la siguiente. Marcar `[x]` al terminar.
 - [x] **T5 · `IAnomalyRule`** — ADR-05
   Interfaz de `003` §3, con `AppliesToInvalidRecords` por defecto en `false`.
 
-- [ ] **T6 · `StructuralValidationRule`** — RF-01
+- [x] **T6 · `StructuralValidationRule`** — RF-01
   Los seis códigos de `001` §4, más `Validate` e `IsStructurallyValid` estáticos.
   *Test:* un caso por código; el id 7 del dataset produce dos anomalías
   (`NEGATIVE_ENERGY` y `NEGATIVE_CO2`); un registro sano devuelve `Passed`.
