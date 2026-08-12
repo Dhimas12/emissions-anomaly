@@ -167,11 +167,19 @@ la respuesta al Escenario B.
 | `IntensityHighSeverityDeviation` | 1,0   | desviación de **intensidad** ≥100 % ⇒ severidad alta                  |
 | `IntensityMediumSeverityDeviation`| 0,7  | desviación de **intensidad** ≥70 % ⇒ severidad media                  |
 
-Las dos últimas existen porque la intensidad tiene su propia escala y no la de volumen.
-El factor de emisión de una sede es estable mientras no cambie el mix energético, así que
-duplicarlo ya es una señal fuerte; el consumo, en cambio, sube y baja con la actividad y
-necesita triplicarse para decir lo mismo. Reutilizar los umbrales de RF-03 en RF-04b
-mezclaría dos magnitudes que ADR-04 separa a propósito.
+Las dos últimas existen porque consumo e intensidad tienen **fuentes de variación legítima
+distintas**. No es que una desviación sea más grave en una magnitud que en otra.
+
+El consumo se mueve con la actividad real: producción, ocupación, temperatura, calendario
+laboral. Duplicarlo puede ser perfectamente normal —el Escenario A es exactamente eso—, así
+que hace falta una desviación grande antes de sospechar del dato. La intensidad solo se
+mueve si cambia el mix de la red o la comercializadora, y eso ocurre pocas veces y de forma
+gradual.
+
+De ahí que la misma desviación relativa pese más como evidencia en intensidad que en
+consumo: en intensidad quedan muchas menos explicaciones inocentes que descartar antes de
+llegar a "el dato está mal". Reutilizar los umbrales de RF-03 en RF-04b mezclaría dos
+magnitudes que ADR-04 separa a propósito.
 
 **Consecuencia importante y buscada:** `MinimumBaselineSize = 3` con base
 *leave-one-out* implica que Barcelona (3 válidos ⇒ base de 2) y Valencia (2

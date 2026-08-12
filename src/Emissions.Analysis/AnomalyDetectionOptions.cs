@@ -17,8 +17,15 @@ public sealed class AnomalyDetectionOptions : IValidatableObject
     [Range(0.0, double.MaxValue, MinimumIsExclusive = true)]
     public double MinimumRelativeDeviation { get; set; } = 0.25;
 
-    // El valor de producto es 3. El mínimo aceptable es 2 porque con un solo punto no hay
-    // dispersión que medir y el MAD sale cero por construcción, no por estabilidad real.
+    // El valor de producto es 3. El suelo de 2 solo impide lo que no significa nada: con
+    // un único punto el MAD sale cero por construcción, no porque la serie sea estable.
+    //
+    // Conviene ser honesto sobre lo que este rango NO protege. Un valor de 500 en un
+    // sistema con doce meses por sede dejaría todas las reglas estadísticas en
+    // NotEvaluated para siempre: el detector no marcaría nada, en silencio y con el CI en
+    // verde. Ningún techo arbitrario atrapa eso —99 pasaría igual con un límite de 100—.
+    // Lo atrapa la observabilidad, no la validación: alertar si la proporción de
+    // NotEvaluated supera un umbral en producción. Anotado como evolución en T13.
     [Range(2, int.MaxValue)]
     public int MinimumBaselineSize { get; set; } = 3;
 
@@ -40,10 +47,12 @@ public sealed class AnomalyDetectionOptions : IValidatableObject
     [Range(0.0, double.MaxValue, MinimumIsExclusive = true)]
     public double MediumSeverityRelativeDeviation { get; set; } = 1.0;
 
-    // La intensidad tiene su propia escala y no la del volumen (ADR-04). El factor de
-    // emisión de una sede es estable mientras no cambie el mix, así que duplicarlo ya es
-    // señal fuerte; el consumo sube y baja con la actividad y necesita triplicarse para
-    // decir lo mismo.
+    // La intensidad tiene su propia escala y no la del volumen (ADR-04), porque las dos
+    // magnitudes tienen fuentes de variación legítima distintas. El consumo se mueve con
+    // la actividad real —producción, ocupación, temperatura, calendario laboral— y
+    // duplicarlo puede ser normal; la intensidad solo se mueve si cambia el mix de la red
+    // o la comercializadora. La misma desviación relativa pesa más como evidencia en
+    // intensidad porque quedan muchas menos explicaciones inocentes que descartar.
     [Range(0.0, double.MaxValue, MinimumIsExclusive = true)]
     public double IntensityHighSeverityDeviation { get; set; } = 1.0;
 

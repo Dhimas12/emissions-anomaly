@@ -28,7 +28,7 @@ antes de empezar la siguiente. Marcar `[x]` al terminar.
   método `Validate()` para las coherencias cruzadas.
   *Test:* configuración con `MinCarbonIntensity >= MaxCarbonIntensity` es rechazada.
 
-- [ ] **T4 · `SiteHistory`** — RN-01, RN-02
+- [x] **T4 · `SiteHistory`** — RN-01, RN-02
   Separación entre `AllRecords` y `ValidRecords`, y `BaselineExcluding`.
   *Test:* `SiteHistoryTests.RN02_*` — la base de un registro nunca lo contiene;
   los valores nulos o no finitos quedan fuera.
@@ -95,6 +95,12 @@ antes de empezar la siguiente. Marcar `[x]` al terminar.
   justificación, la tabla de resultados sobre el dataset, la sección de escalado a
   millones de registros (`002` §4) y las limitaciones conocidas.
   Sin capturas, sin badges, sin secciones de relleno.
+  En evolución futura, además de `002` §7: **observabilidad de la tasa de
+  `NotEvaluated`**. Un `MinimumBaselineSize` mal calibrado —500 en un sistema con doce
+  meses por sede— dejaría todas las reglas estadísticas sin evaluar para siempre y el
+  detector no marcaría nada, en silencio y con el CI en verde. Ningún rango de validación
+  atrapa eso, porque 99 pasaría igual con un techo de 100; lo atrapa alertar cuando la
+  proporción de `NotEvaluated` supera un umbral en producción.
 
 - [ ] **T14 · ESCENARIOS.md**
   Respuesta a los escenarios A y B partiendo de `005-escenarios-borrador.md`.
