@@ -328,7 +328,7 @@ si CarbonIntensity es null → una sola evaluación NotEvaluated sobre CARBON_IN
           "outcome": "Anomaly", "message": "…", "severity": "High",
           "evidence": { "energyKwh": 79000, "baselineMedianKwh": 12500,
                         "baselineMad": 300, "baselineSize": 3,
-                        "modifiedZScore": 149.5145, "relativeDeviation": 5.32 } }
+                        "modifiedZScore": 149.5142, "relativeDeviation": 5.32 } }
       ],
       "notes": []
     }
@@ -391,9 +391,32 @@ caería. Es el test de regresión más importante de la entrega.
 
 | Entrada                         | Median | MAD  | ModifiedZScore(x)              |
 |---------------------------------|--------|------|--------------------------------|
-| `[1, 2, 3, 4]`                  | 2,5    | 1,0  | z(10) = 5,0588                 |
-| `[12000, 12500, 12800]`         | 12500  | 300  | z(79000) = 149,5145            |
+| `[1, 2, 3, 4]`                  | 2,5    | 1,0  | z(10) = 5,05875                |
+| `[12000, 12500, 12800]`         | 12500  | 300  | z(79000) = 149,5142            |
 | `[5, 5, 5]`                     | 5      | 0    | null (MAD cero)                |
 | `[]`                            | lanza `ArgumentException` | — | —              |
 
 `RelativeDeviation(79000, 12500) = 5,32` · `RelativeDeviation(10, 0) = null`.
+
+`z(79000) = 0,6745 × 66500 / 300 = 44854,25 / 300 = 179417/1200 = 149,514166…`, que a
+cuatro decimales es **149,5142**. Una versión anterior de esta tabla decía 149,5145.
+
+`z(10) = 0,6745 × 7,5 = 5,05875` se deja con sus cinco decimales exactos a propósito. A
+cuatro decimales cae justo en un punto medio de redondeo, y ahí el resultado depende de
+la representación binaria y del modo de redondeo: el mismo test pasaría en una máquina y
+fallaría en otra.
+
+### Comparación de flotantes en los tests
+
+Toda aserción sobre un valor dorado usa **tolerancia explícita** —`Assert.Equal(esperado,
+actual, 1e-4)`, la sobrecarga de tolerancia de xUnit— y nunca igualdad exacta ni
+comparación por número de decimales.
+
+El motivo es que comparar `double` por igualdad hace que el test mida la aritmética de
+coma flotante en lugar de medir el criterio de detección, y convierte cualquier valor que
+caiga cerca de un punto medio de redondeo en una fuente de fallos intermitentes. Un CI que
+falla de forma intermitente es peor que no tenerlo (RN-CI-03).
+
+Esto **no** es el redondeo a cuatro decimales de la evidencia de §3: aquello es formato de
+salida para el analista y se queda como está. Lo que se fija aquí es cómo comparan los
+tests.
