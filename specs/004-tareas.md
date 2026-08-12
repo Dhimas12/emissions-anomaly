@@ -103,7 +103,7 @@ antes de empezar la siguiente. Marcar `[x]` al terminar.
   atrapa eso, porque 99 pasaría igual con un techo de 100; lo atrapa alertar cuando la
   proporción de `NotEvaluated` supera un umbral en producción.
 
-- [ ] **T14 · ESCENARIOS.md**
+- [x] **T14 · ESCENARIOS.md**
   Respuesta a los escenarios A y B partiendo de `005-escenarios-borrador.md`.
   Breve y con criterio; el enunciado pide explícitamente que no sea teoría extensa.
 
