@@ -41,7 +41,7 @@ antes de empezar la siguiente. Marcar `[x]` al terminar.
   *Test:* un caso por código; el id 7 del dataset produce dos anomalías
   (`NEGATIVE_ENERGY` y `NEGATIVE_CO2`); un registro sano devuelve `Passed`.
 
-- [ ] **T7 · `DuplicatePeriodRule`** — RF-02
+- [x] **T7 · `DuplicatePeriodRule`** — RF-02
   *Test:* dos registros de la misma sede y mes ⇒ ambos marcados `High`, y cada uno
   referencia al otro en `duplicateRecordIds`. Sin duplicados ⇒ `Passed`.
 
