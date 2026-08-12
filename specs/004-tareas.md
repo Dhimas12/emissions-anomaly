@@ -67,7 +67,7 @@ antes de empezar la siguiente. Marcar `[x]` al terminar.
     tiene intensidad 0,2304 frente a mediana 0,2320 de Madrid ⇒ `Passed`.
   - `RF06_HistoricoInsuficiente_HistoricoNoSeEvaluaPeroLaBandaSi` — Valencia.
 
-- [ ] **T10 · `AnomalyDetectionEngine` + DI** — RF-05, RF-06, RN-01
+- [x] **T10 · `AnomalyDetectionEngine` + DI** — RF-05, RF-06, RN-01
   Las cuatro fases de `002` §1. Agregación: `requiresReview`, severidad máxima,
   `reason` por severidad y desempate por prioridad, `notes` con los mensajes
   `NotEvaluated`. `AddAnomalyDetection` y `CreateDefaultEngine`.
