@@ -107,14 +107,33 @@ repositorio; no hay motivo para concederle escritura.
 `ubuntu-latest`. Pasos en orden:
 
 1. `actions/checkout@v4`
-2. `actions/setup-dotnet@v4` con `dotnet-version: '8.0.x'`
-3. `actions/cache@v4` sobre `~/.nuget/packages`, clave
+2. **Comprobación de activación**, mismo mecanismo que el job `acceptance`. Un paso
+   con `id: gate` que define la salida `ready` según exista o no una solución:
+
+   ```bash
+   if ls *.sln >/dev/null 2>&1; then
+     echo "ready=true" >> $GITHUB_OUTPUT
+   else
+     echo "ready=false" >> $GITHUB_OUTPUT
+     echo "Aun no hay solucion que compilar (tarea T0). Build y tests omitidos." \
+       >> $GITHUB_STEP_SUMMARY
+   fi
+   ```
+
+   Todos los pasos siguientes llevan `if: steps.gate.outputs.ready == 'true'`.
+
+   El motivo es el mismo que en RF-CI-03 y se aplica a un caso concreto: el propio
+   PR que introduce este workflow se abre antes de que exista la solución, así que
+   sin el gate el primer PR del repositorio arrancaría en rojo. Un CI que nace roto
+   no llega a leerse nunca.
+3. `actions/setup-dotnet@v4` con `dotnet-version: '8.0.x'`
+4. `actions/cache@v4` sobre `~/.nuget/packages`, clave
    `${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}` y `restore-keys`
    `${{ runner.os }}-nuget-`
-4. `dotnet restore`
-5. `dotnet build --configuration Release --no-restore`
-6. `dotnet test --configuration Release --no-build --logger "trx;LogFileName=test-results.trx" --results-directory ./TestResults`
-7. `actions/upload-artifact@v4` con `if: always()`, nombre `test-results`,
+5. `dotnet restore`
+6. `dotnet build --configuration Release --no-restore`
+7. `dotnet test --configuration Release --no-build --logger "trx;LogFileName=test-results.trx" --results-directory ./TestResults`
+8. `actions/upload-artifact@v4` con `if: always()`, nombre `test-results`,
    ruta `./TestResults`, `retention-days: 7`
 
 El artefacto se sube con `if: always()` a propósito: los resultados de test
