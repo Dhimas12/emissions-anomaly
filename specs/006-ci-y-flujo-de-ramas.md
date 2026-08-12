@@ -225,10 +225,20 @@ Para que RN-CI-01 sea una barrera real y no una intención, en GitHub:
 
 Settings → Branches → Add branch protection rule sobre `main`:
 
-- Require a pull request before merging
+- Require a pull request before merging, con **cero aprobaciones requeridas**
 - Require status checks to pass before merging → seleccionar **`Build y tests`** y
   **`Criterios de aceptacion (spec 001 §6)`**
 - Require branches to be up to date before merging
+- **Do not allow bypassing the above settings** (`enforce_admins`)
+
+Las cero aprobaciones no son una rebaja de la regla: en un repositorio de un solo
+colaborador, exigir una aprobación sería exigir lo imposible —GitHub no permite aprobar
+el propio pull request— y la salida sería desactivar la protección entera. Lo que aporta
+la regla aquí es obligar a que todo pase por un PR con los checks en verde, y eso se
+mantiene intacto.
+
+Sin `enforce_admins`, el dueño del repositorio puede empujar directo a `main` y la
+protección queda decorativa: describe una disciplina en lugar de imponerla.
 
 > **Aviso de plan.** Las reglas de protección de rama están disponibles en repos
 > **públicos** con GitHub Free, pero en repos **privados** requieren GitHub Pro,
@@ -250,16 +260,18 @@ esperando un check que ya no existe y bloquea todos los PRs.
   *Hecho cuando:* el workflow aparece en la pestaña Actions y el job
   `build-and-test` termina en verde con el gate de aceptación omitido.
 
-- [ ] **T-CI-2 · Test de humo en T0**
+- [x] **T-CI-2 · Test de humo en T0**
   El PR de la tarea T0 debe incluir al menos un test real, o `dotnet test` falla
   con "No test is available" y el CI arranca en rojo. Test mínimo aceptable, en
   `SampleDatasetTests`: deserializar `Data/sample-records.json` y comprobar que
   contiene 10 registros y que el id 7 tiene energía negativa. No es relleno:
   verifica que el dataset se copia al output, que es un fallo real y silencioso.
 
-- [ ] **T-CI-3 · Protección de rama**
+- [x] **T-CI-3 · Protección de rama**
   Configurar `main` según §5, o dejar constancia en el README de por qué no se
-  pudo (plan de GitHub).
+  pudo (plan de GitHub). *Aplicada:* el repositorio es público, así que el aviso de
+  plan no llegó a aplicar. Los dos nombres de check se verificaron contra los
+  `name:` del workflow antes de darla por buena.
 
 ---
 
