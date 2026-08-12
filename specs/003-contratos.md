@@ -93,7 +93,7 @@ compila.
 | Proyecto              | Paquetes |
 |-----------------------|----------|
 | `Emissions.Domain`    | ninguno |
-| `Emissions.Analysis`  | `Microsoft.Extensions.Options` 8.0.2, `Microsoft.Extensions.Options.ConfigurationExtensions` 8.0.0, `Microsoft.Extensions.DependencyInjection.Abstractions` 8.0.2 |
+| `Emissions.Analysis`  | `Microsoft.Extensions.Options` 8.0.2, `Microsoft.Extensions.Options.ConfigurationExtensions` 8.0.0, `Microsoft.Extensions.Options.DataAnnotations` 8.0.0, `Microsoft.Extensions.DependencyInjection.Abstractions` 8.0.2 |
 | `Emissions.Api`       | `Swashbuckle.AspNetCore` 6.6.2 |
 | tests                 | `Microsoft.NET.Test.Sdk` 17.10.0, `xunit` 2.8.1, `xunit.runner.visualstudio` 2.8.1 |
 
@@ -301,7 +301,9 @@ si CarbonIntensity es null → una sola evaluación NotEvaluated sobre CARBON_IN
     si base.Count < MinimumBaselineSize → NotEvaluated
     rel ← RelativeDeviation(intensidad, mediana(base))
     si |rel| ≤ IntensityRelativeTolerance → Passed
-    si no → Anomaly, severidad: |rel| ≥ 1,0 ⇒ High · ≥ 0,7 ⇒ Medium · resto ⇒ Low
+    si no → Anomaly, severidad: |rel| ≥ IntensityHighSeverityDeviation   ⇒ High
+                                |rel| ≥ IntensityMediumSeverityDeviation ⇒ Medium
+                                resto                                    ⇒ Low
 ```
 
 ## 5. Contrato JSON de la API

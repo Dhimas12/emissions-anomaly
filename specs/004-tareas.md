@@ -23,7 +23,7 @@ antes de empezar la siguiente. Marcar `[x]` al terminar.
   *Test:* `RobustStatisticsTests`, contra la tabla de `003` §6 "valores unitarios".
   Incluir el caso de muestra vacía (lanza) y el de MAD cero (devuelve null).
 
-- [ ] **T3 · `AnomalyDetectionOptions`** — RN-07, ADR-06
+- [x] **T3 · `AnomalyDetectionOptions`** — RN-07, ADR-06
   Propiedades y valores por defecto de `002` §3, con `DataAnnotations` y el
   método `Validate()` para las coherencias cruzadas.
   *Test:* configuración con `MinCarbonIntensity >= MaxCarbonIntensity` es rechazada.
