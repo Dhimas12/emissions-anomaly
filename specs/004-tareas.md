@@ -33,7 +33,7 @@ antes de empezar la siguiente. Marcar `[x]` al terminar.
   *Test:* `SiteHistoryTests.RN02_*` — la base de un registro nunca lo contiene;
   los valores nulos o no finitos quedan fuera.
 
-- [ ] **T5 · `IAnomalyRule`** — ADR-05
+- [x] **T5 · `IAnomalyRule`** — ADR-05
   Interfaz de `003` §3, con `AppliesToInvalidRecords` por defecto en `false`.
 
 - [ ] **T6 · `StructuralValidationRule`** — RF-01
