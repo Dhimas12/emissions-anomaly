@@ -1,0 +1,14 @@
+[
+  { "id": 1,  "site": "Madrid",    "month": "2026-01", "energyKwh": 12000, "co2Kg": 2800 },
+  { "id": 2,  "site": "Madrid",    "month": "2026-02", "energyKwh": 12500, "co2Kg": 2900 },
+  { "id": 3,  "site": "Madrid",    "month": "2026-03", "energyKwh": 12800, "co2Kg": 2950 },
+  { "id": 4,  "site": "Madrid",    "month": "2026-04", "energyKwh": 79000, "co2Kg": 18200 },
+
+  { "id": 5,  "site": "Barcelona", "month": "2026-01", "energyKwh": 8500,  "co2Kg": 1950 },
+  { "id": 6,  "site": "Barcelona", "month": "2026-02", "energyKwh": 8700,  "co2Kg": 2000 },
+  { "id": 7,  "site": "Barcelona", "month": "2026-03", "energyKwh": -900,  "co2Kg": -210 },
+  { "id": 8,  "site": "Barcelona", "month": "2026-04", "energyKwh": 8900,  "co2Kg": 8500 },
+
+  { "id": 9,  "site": "Valencia",  "month": "2026-01", "energyKwh": 6200,  "co2Kg": 1450 },
+  { "id": 10, "site": "Valencia",  "month": "2026-02", "energyKwh": 6250,  "co2Kg": 1460 }
+]
