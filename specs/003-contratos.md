@@ -13,15 +13,19 @@ estructura de archivos, las firmas públicas y los valores numéricos esperados.
 ```
 emissions-anomaly/
 ├── CLAUDE.md
-├── README.md                                   ← T11
-├── ESCENARIOS.md                               ← T11
+├── README.md                                   ← T13
+├── ESCENARIOS.md                               ← T14
 ├── EmissionsAnomaly.sln
+├── global.json                                 ← T0
 ├── .gitignore
+├── .github/                                    ← T-CI-1, detallado en 006 §3.1
 ├── specs/
 │   ├── 001-especificacion.md
 │   ├── 002-plan-tecnico.md
 │   ├── 003-contratos.md
-│   └── 004-tareas.md
+│   ├── 004-tareas.md
+│   ├── 005-escenarios-borrador.md
+│   └── 006-ci-y-flujo-de-ramas.md
 ├── src/
 │   ├── Emissions.Domain/
 │   │   ├── Emissions.Domain.csproj
@@ -53,6 +57,7 @@ emissions-anomaly/
     └── Emissions.Analysis.Tests/
         ├── Emissions.Analysis.Tests.csproj
         ├── RobustStatisticsTests.cs
+        ├── AnomalyDetectionOptionsTests.cs
         ├── SiteHistoryTests.cs
         ├── StructuralValidationRuleTests.cs
         ├── DuplicatePeriodRuleTests.cs
@@ -60,8 +65,17 @@ emissions-anomaly/
         ├── CarbonIntensityRuleTests.cs
         ├── AnomalyDetectionEngineTests.cs
         ├── AcceptanceTests.cs
-        └── SampleDataset.cs            (dataset del enunciado como fixture)
+        ├── SampleDataset.cs            (dataset del enunciado como fixture)
+        └── SampleDatasetTests.cs       (humo de T0, exigido por 006 T-CI-2)
 ```
+
+### `global.json`
+
+Fija la banda del SDK 8 con `rollForward: latestFeature`. No es adorno: en una máquina
+con varios SDK instalados, compilar con uno posterior activa analizadores nuevos cuyos
+avisos, con `TreatWarningsAsErrors`, se convierten en errores. Sin fijarlo, "compila
+sin avisos" deja de ser una propiedad del repositorio y pasa a depender de quién lo
+compila.
 
 ### Propiedades comunes de los `.csproj` de `src/`
 
@@ -83,6 +97,20 @@ emissions-anomaly/
 
 En el proyecto de tests, `TreatWarningsAsErrors` va **desactivado** (los
 analizadores de xUnit generan avisos que no aportan aquí).
+
+Referencias entre proyectos: `Analysis` → `Domain`, `Api` → `Analysis`,
+`Tests` → `Analysis`. El proyecto de tests **no** referencia a `Api`; para llegar al
+dataset enlaza el fichero sin crear dependencia:
+
+```xml
+<Content Include="..\..\src\Emissions.Api\Data\sample-records.json"
+         Link="Data\sample-records.json"
+         CopyToOutputDirectory="PreserveNewest" />
+```
+
+En `Emissions.Api.csproj` el mismo fichero se marca con `Content **Update**`, no
+`Include`: el SDK Web ya incluye `**/*.json` como `Content` por defecto y un `Include`
+duplicaría el item (NETSDK1022).
 
 ---
 
@@ -193,6 +221,9 @@ public static class ServiceCollectionExtensions
 | `DuplicatePeriodRule`       | `DUPLICATE_PERIOD`                                         | RF-02           | 20       | **true**                  |
 | `ConsumptionDeviationRule`  | `CONSUMPTION_DEVIATION`                                    | RF-03           | 30       | false                     |
 | `CarbonIntensityRule`       | `CARBON_INTENSITY_BAND` y `CARBON_INTENSITY_HISTORY`       | RF-04a / RF-04b | 40       | false                     |
+
+Las cuatro reglas viven en `Rules/` y declaran el namespace
+`Emissions.Analysis.Rules`; el resto del motor va en `Emissions.Analysis`.
 
 `CarbonIntensityRule` devuelve **dos** evaluaciones (banda e histórico) en una
 sola llamada; por eso `RuleEvaluation` lleva su propio `RuleId` en vez de

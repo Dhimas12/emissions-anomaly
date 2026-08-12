@@ -7,7 +7,7 @@ antes de empezar la siguiente. Marcar `[x]` al terminar.
 
 ---
 
-- [ ] **T0 · Andamiaje**
+- [x] **T0 · Andamiaje**
   Solución `EmissionsAnomaly.sln`, los cuatro proyectos con las propiedades y
   paquetes de `003` §1, referencias entre proyectos, `.gitignore` de .NET.
   *Hecho cuando:* `dotnet build` compila sin avisos.
