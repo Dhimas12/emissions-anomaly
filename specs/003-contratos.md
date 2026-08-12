@@ -126,9 +126,17 @@ namespace Emissions.Domain;
 public sealed record EmissionRecord(
     int Id, string? Site, string? Month, double? EnergyKwh, double? Co2Kg)
 {
-    // Null si no es calculable, que son cuatro casos: `EnergyKwh` ausente, cero o
-    // negativa —sin divisor válido no hay cociente que signifique nada— y `Co2Kg`
-    // ausente, porque un numerador que falta no es lo mismo que un numerador cero.
+    // Invariante del tipo: null siempre que no pueda producir un número finito y con
+    // significado. Cuatro casos: `Co2Kg` ausente · `EnergyKwh` ausente · cualquiera de
+    // los dos no finito · `EnergyKwh <= 0`.
+    //
+    // `Co2Kg == 0` sí calcula y devuelve 0: es una medición real —"no emitió"— y que
+    // RF-04a la marque por debajo de la banda es el comportamiento correcto. Un
+    // numerador ausente, en cambio, no es un numerador cero.
+    //
+    // El caso no finito pertenece al tipo y no a la regla: `NaN` hace falsas todas las
+    // comparaciones, así que RF-04a devolvería `Passed` sobre un dato corrupto. Que
+    // RF-01 lo intercepte antes con `NON_FINITE` no basta para sostener el invariante.
     public double? CarbonIntensity { get; }
 }
 

@@ -23,6 +23,23 @@ public sealed class EmissionRecordTests
         Assert.Null(record.CarbonIntensity);
     }
 
+    // NaN hace falsas todas las comparaciones, así que una intensidad NaN atravesaría la
+    // banda física de RF-04a como si fuese correcta. El invariante es del tipo: no basta
+    // con que RF-01 marque el registro por NON_FINITE antes de llegar a la regla.
+    [Theory]
+    [InlineData(double.NaN, 2800d)]
+    [InlineData(double.PositiveInfinity, 2800d)]
+    [InlineData(double.NegativeInfinity, 2800d)]
+    [InlineData(12000d, double.NaN)]
+    [InlineData(12000d, double.PositiveInfinity)]
+    [InlineData(12000d, double.NegativeInfinity)]
+    public void RF04_ConValoresNoFinitos_LaIntensidadNoEsCalculable(double energyKwh, double co2Kg)
+    {
+        var record = new EmissionRecord(1, "Madrid", "2026-01", energyKwh, co2Kg);
+
+        Assert.Null(record.CarbonIntensity);
+    }
+
     // Un CO₂ de cero sí es calculable: significa "no emitió", no "no lo sabemos". Es la
     // distinción que sostiene EMISSIONS_WITHOUT_ENERGY y el resto de RF-01.
     [Fact]

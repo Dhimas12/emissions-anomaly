@@ -9,11 +9,16 @@ public sealed record EmissionRecord(
     double? EnergyKwh,
     double? Co2Kg)
 {
-    // Factor de emisión implícito de la sede, en kg CO₂/kWh (RF-04). Null cuando no es
-    // calculable: sin energía positiva no hay divisor que produzca un cociente con
-    // sentido físico, y un CO₂ ausente no es lo mismo que un CO₂ de cero.
+    // Factor de emisión implícito de la sede, en kg CO₂/kWh (RF-04). Null siempre que no
+    // pueda producir un número finito y con significado, que es un invariante del tipo y
+    // no de las reglas: NaN hace falsas todas las comparaciones, así que una intensidad
+    // NaN atravesaría la banda física de RF-04a como si fuese correcta. Que RF-01 marque
+    // el registro por NON_FINITE antes de llegar ahí no basta para sostenerlo.
+    //
+    // Un CO₂ de cero sí calcula y da 0: es una medición real, no una ausencia de dato.
     public double? CarbonIntensity =>
-        EnergyKwh is { } energy && energy > 0 && Co2Kg is { } co2
+        EnergyKwh is { } energy && double.IsFinite(energy) && energy > 0
+        && Co2Kg is { } co2 && double.IsFinite(co2)
             ? co2 / energy
             : null;
 }
