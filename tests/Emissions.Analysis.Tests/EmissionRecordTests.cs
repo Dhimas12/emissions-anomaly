@@ -4,6 +4,9 @@ namespace Emissions.Analysis.Tests;
 
 public sealed class EmissionRecordTests
 {
+    // 003 §6: tolerancia explícita, nunca igualdad exacta sobre valores dorados.
+    private const double Tolerance = 1e-4;
+
     [Theory]
     [InlineData(null)]
     [InlineData(0d)]
@@ -47,7 +50,8 @@ public sealed class EmissionRecordTests
     {
         var record = new EmissionRecord(1, "Madrid", "2026-01", 12000, 0);
 
-        Assert.Equal(0d, record.CarbonIntensity);
+        Assert.NotNull(record.CarbonIntensity);
+        Assert.Equal(0d, record.CarbonIntensity!.Value, Tolerance);
     }
 
     // Intensidades de la tabla de valores dorados de 003 §6, sobre el dataset del enunciado.
@@ -63,6 +67,6 @@ public sealed class EmissionRecordTests
         var record = new EmissionRecord(id, "Madrid", "2026-01", energyKwh, co2Kg);
 
         Assert.NotNull(record.CarbonIntensity);
-        Assert.Equal(expected, record.CarbonIntensity!.Value, 4);
+        Assert.Equal(expected, record.CarbonIntensity!.Value, Tolerance);
     }
 }
