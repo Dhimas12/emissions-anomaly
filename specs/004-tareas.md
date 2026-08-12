@@ -58,7 +58,7 @@ antes de empezar la siguiente. Marcar `[x]` al terminar.
   - `RF03_SerieConstante_MadCero_DecideLaMaterialidad` — base `[5000, 5000, 5000]`:
     5.200 (+4 %) no se marca; 9.000 (+80 %) sí.
 
-- [ ] **T9 · `CarbonIntensityRule`** — RF-04
+- [x] **T9 · `CarbonIntensityRule`** — RF-04
   Las dos evaluaciones de `003` §4, con sus `RuleId` distintos.
   *Tests obligatorios:*
   - `RF04a_IntensidadFueraDeBanda_SeMarcaAlto` — id 8, intensidad 0,9551.
