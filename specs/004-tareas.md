@@ -12,7 +12,7 @@ antes de empezar la siguiente. Marcar `[x]` al terminar.
   paquetes de `003` §1, referencias entre proyectos, `.gitignore` de .NET.
   *Hecho cuando:* `dotnet build` compila sin avisos.
 
-- [ ] **T1 · Modelos de dominio** — RF-05
+- [x] **T1 · Modelos de dominio** — RF-05
   `EmissionRecord`, `Severity`, `RuleOutcome`, `RuleEvaluation`, `RecordAnalysis`,
   `AnalysisSummary`, `AnalysisResult` según `003` §2.
   *Hecho cuando:* `CarbonIntensity` devuelve null para energía nula, cero o negativa,

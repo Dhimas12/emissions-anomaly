@@ -56,6 +56,8 @@ emissions-anomaly/
 └── tests/
     └── Emissions.Analysis.Tests/
         ├── Emissions.Analysis.Tests.csproj
+        ├── EmissionRecordTests.cs
+        ├── RuleEvaluationTests.cs
         ├── RobustStatisticsTests.cs
         ├── AnomalyDetectionOptionsTests.cs
         ├── SiteHistoryTests.cs
@@ -124,7 +126,17 @@ namespace Emissions.Domain;
 public sealed record EmissionRecord(
     int Id, string? Site, string? Month, double? EnergyKwh, double? Co2Kg)
 {
-    // Null si no es calculable (energía nula, cero o negativa).
+    // Invariante del tipo: null siempre que no pueda producir un número finito y con
+    // significado. Cuatro casos: `Co2Kg` ausente · `EnergyKwh` ausente · cualquiera de
+    // los dos no finito · `EnergyKwh <= 0`.
+    //
+    // `Co2Kg == 0` sí calcula y devuelve 0: es una medición real —"no emitió"— y que
+    // RF-04a la marque por debajo de la banda es el comportamiento correcto. Un
+    // numerador ausente, en cambio, no es un numerador cero.
+    //
+    // El caso no finito pertenece al tipo y no a la regla: `NaN` hace falsas todas las
+    // comparaciones, así que RF-04a devolvería `Passed` sobre un dato corrupto. Que
+    // RF-01 lo intercepte antes con `NON_FINITE` no basta para sostener el invariante.
     public double? CarbonIntensity { get; }
 }
 
