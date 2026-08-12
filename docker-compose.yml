@@ -1,0 +1,14 @@
+services:
+  dev:
+    build: .
+    container_name: emissions-dev
+    stdin_open: true          # imprescindible: Claude Code es interactivo
+    tty: true
+    working_dir: /workspace
+    ports:
+      - "5080:5080"           # la Minimal API
+    volumes:
+      - .:/workspace          # tu código, editable desde el host
+      - dev-home:/home/dev    # persiste el login de Claude Code y la caché NuGet
+volumes:
+  dev-home:
