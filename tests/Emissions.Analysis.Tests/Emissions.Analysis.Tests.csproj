@@ -29,6 +29,9 @@
     <Content Include="..\..\src\Emissions.Api\Data\sample-records.json"
              Link="Data\sample-records.json"
              CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\src\Emissions.Api\appsettings.json"
+             Link="Api.appsettings.json"
+             CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
