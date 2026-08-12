@@ -74,14 +74,24 @@ información no existe, así que el coste aquí es nominal.
 
 ### ADR-02 · Doble condición: significancia estadística **y** materialidad
 
-**Contexto.** En una serie muy estable el MAD tiende a cero y cualquier variación
-produce un z-score enorme. Si a Madrid le llegase un mes de 13.500 kWh (+8 %), el
-z-score superaría 3,5 y saltaría la alerta.
+**Contexto.** El MAD de una serie estable es pequeño, así que basta una variación modesta
+para que el z-score se dispare. Con la base de Madrid `[12000, 12500, 12800]` —mediana
+12.500, MAD 300—, un mes de 15.000 kWh da:
+
+```
+z   = 0,6745 × (15000 − 12500) / 300 = 5,6208
+rel = (15000 − 12500) / 12500        = 0,20
+```
+
+Es decir **z = 5,62 frente a un umbral de 3,5**, y **una desviación del 20 % frente a una
+materialidad del 25 %**. Con solo el criterio estadístico, el sistema alertaría por una
+subida del 20 % en el consumo mensual, que el clima o el calendario laboral explican sin
+necesidad de sospechar del dato.
 
 **Decisión.** Anomalía solo si `|z| > 3,5` **y** desviación relativa > 25 %.
 
 **Por qué.** El z-score responde a "¿es raro?" y la desviación relativa a
-"¿importa?". Un sistema que dispara por un 8 % de variación mensual se desactiva
+"¿importa?". Un sistema que dispara por un 20 % de variación mensual se desactiva
 solo: el analista deja de mirarlo en dos semanas y vuelven los falsos negativos
 por la puerta de atrás. La materialidad es un concepto de auditoría, no un parche;
 incorporarla alinea la detección con cómo se juzgan realmente los informes ESG.

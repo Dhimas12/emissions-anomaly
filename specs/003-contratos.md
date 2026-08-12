@@ -432,6 +432,11 @@ coma flotante en lugar de medir el criterio de detección, y convierte cualquier
 caiga cerca de un punto medio de redondeo en una fuente de fallos intermitentes. Un CI que
 falla de forma intermitente es peor que no tenerlo (RN-CI-03).
 
+La tolerancia se ajusta a los decimales que **declara** cada tabla, no al revés. La tabla
+de RF-03 da tres decimales, así que sus valores se comparan con `5e-4`, media unidad del
+último dígito: exigirle `1e-4` sería pedirle una precisión que no afirma tener, y el test
+fallaría por un redondeo correcto —`z(12000)` es −1,798667 y la tabla escribe −1,799—.
+
 Esto **no** es el redondeo a cuatro decimales de la evidencia de §3: aquello es formato de
 salida para el analista y se queda como está. Lo que se fija aquí es cómo comparan los
 tests.

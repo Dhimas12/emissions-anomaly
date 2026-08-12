@@ -45,14 +45,15 @@ antes de empezar la siguiente. Marcar `[x]` al terminar.
   *Test:* dos registros de la misma sede y mes ⇒ ambos marcados `High`, y cada uno
   referencia al otro en `duplicateRecordIds`. Sin duplicados ⇒ `Passed`.
 
-- [ ] **T8 · `ConsumptionDeviationRule`** — RF-03, RN-02, RN-03
+- [x] **T8 · `ConsumptionDeviationRule`** — RF-03, RN-02, RN-03
   Algoritmo literal de `003` §4.
   *Tests obligatorios:*
   - `RF03_ConsumoMuySuperiorALaBase_SeMarcaAlto` — id 4, z ≈ 149,5142, rel = 5,32.
   - `RF03_ConsumoNormal_NoSeMarca` — ids 1–3.
   - `RN03_DesviacionExtremaPeroInmaterial_NoSeMarca` — base `[12000, 12500, 12800]`
-    con valor 13.500: el z supera 3,5 pero la desviación relativa es ~8 %, así que
-    **no** se marca. Es el test que documenta ADR-02.
+    con valor 15.000: `z = 0,6745 × 2500 / 300 = 5,6208` supera 3,5 con holgura, pero la
+    desviación relativa es del 20 % y no llega al 25 % de materialidad, así que **no** se
+    marca. Es el test que documenta ADR-02.
   - `RF06_HistoricoInsuficiente_NoSeEvalua` — base de 2 puntos.
   - `RF03_SerieConstante_MadCero_DecideLaMaterialidad` — base `[5000, 5000, 5000]`:
     5.200 (+4 %) no se marca; 9.000 (+80 %) sí.
