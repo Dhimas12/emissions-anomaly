@@ -82,7 +82,7 @@ antes de empezar la siguiente. Marcar `[x]` al terminar.
   regresión documental: verifica que los ids 1–3 no se marcan pese a convivir con
   el id 4, que es exactamente lo que fallaría con media y σ.
 
-- [ ] **T12 · Minimal API** — RF-07
+- [x] **T12 · Minimal API** — RF-07
   `Program.cs` con los cuatro endpoints de `003` §5, Swagger en la raíz,
   `JsonStringEnumConverter`, `camelCase`, manejo de errores.
   El dataset de ejemplo se lee de `Data/sample-records.json` (copiado al output),
