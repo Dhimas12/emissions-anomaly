@@ -29,6 +29,9 @@ Las tareas de `specs/004-tareas.md` se ejecutan **en orden**, y cada una se
 cierra completa (código + test verde) antes de empezar la siguiente. No se
 adelanta trabajo de tareas posteriores.
 
+Cada tarea vive en su propia rama y se integra por pull request, según
+`specs/006-ci-y-flujo-de-ramas.md`. **Nunca se empuja directamente a `main`.**
+
 ## Reglas de código
 
 - `Nullable` y `TreatWarningsAsErrors` activados en todos los proyectos de `src/`.
@@ -55,8 +58,11 @@ adelanta trabajo de tareas posteriores.
 
 ## Qué NO hacer
 
-- No añadir persistencia, autenticación, CI ni frontend a la solución. Están fuera
-  de alcance y engordan la entrega sin sumar puntos.
+- No añadir persistencia, autenticación ni frontend a la solución. Están fuera de
+  alcance y engordan la entrega sin sumar puntos.
+- La integración continua **sí** está en alcance y tiene su propia especificación:
+  `specs/006-ci-y-flujo-de-ramas.md`. No inventes workflows fuera de lo que ese
+  documento define.
 - El `Dockerfile` y el `docker-compose.yml` de la raíz son **entorno de desarrollo**,
   no parte de la solución: no los modifiques ni generes artefactos que dependan de
   ellos (healthchecks, perfiles de publicación, etc.).

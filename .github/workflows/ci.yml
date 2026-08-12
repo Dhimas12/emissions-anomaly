@@ -1,0 +1,145 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Dos empujes seguidos a la misma rama cancelan la ejecución anterior en lugar de
+# consumir minutos en un resultado que ya no interesa.
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: Build y tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Activación diferida (006 §3.3): el PR que introduce este workflow se abre
+      # antes de que exista la solución. Un CI que nace en rojo no llega a leerse.
+      - name: Comprobar activacion
+        id: gate
+        run: |
+          if ls *.sln >/dev/null 2>&1; then
+            echo "ready=true" >> $GITHUB_OUTPUT
+          else
+            echo "ready=false" >> $GITHUB_OUTPUT
+            echo "Aun no hay solucion que compilar (tarea T0). Build y tests omitidos." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - uses: actions/setup-dotnet@v4
+        if: steps.gate.outputs.ready == 'true'
+        with:
+          dotnet-version: '8.0.x'
+
+      - uses: actions/cache@v4
+        if: steps.gate.outputs.ready == 'true'
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: ${{ runner.os }}-nuget-
+
+      - name: Restore
+        if: steps.gate.outputs.ready == 'true'
+        run: dotnet restore
+
+      - name: Build
+        if: steps.gate.outputs.ready == 'true'
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Test
+        if: steps.gate.outputs.ready == 'true'
+        run: dotnet test --configuration Release --no-build --logger "trx;LogFileName=test-results.trx" --results-directory ./TestResults
+
+      # always(): los resultados de test interesan sobre todo cuando el paso anterior falló.
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.gate.outputs.ready == 'true'
+        with:
+          name: test-results
+          path: ./TestResults
+          retention-days: 7
+
+  acceptance:
+    name: Criterios de aceptacion (spec 001 §6)
+    runs-on: ubuntu-latest
+    # No tiene sentido levantar la API si los tests unitarios ya fallaron.
+    needs: build-and-test
+    steps:
+      - uses: actions/checkout@v4
+
+      # Activación diferida (RF-CI-03): sin esto, los PRs de T1 a T11 estarían en
+      # rojo por diseño y nadie miraría el CI cuando se pusiera rojo de verdad.
+      - name: Comprobar activacion
+        id: gate
+        run: |
+          if [ -f src/Emissions.Api/Program.cs ] && \
+             grep -q 'analysis/sample' src/Emissions.Api/Program.cs; then
+            echo "ready=true" >> $GITHUB_OUTPUT
+          else
+            echo "ready=false" >> $GITHUB_OUTPUT
+            echo "El endpoint de aceptacion aun no existe (tarea T12). Gate omitido." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - uses: actions/setup-dotnet@v4
+        if: steps.gate.outputs.ready == 'true'
+        with:
+          dotnet-version: '8.0.x'
+
+      - uses: actions/cache@v4
+        if: steps.gate.outputs.ready == 'true'
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: ${{ runner.os }}-nuget-
+
+      - name: Levantar la API
+        if: steps.gate.outputs.ready == 'true'
+        run: |
+          dotnet run --project src/Emissions.Api --configuration Release --urls http://localhost:5080 > api.log 2>&1 &
+          echo $! > api.pid
+
+      # Sondeo, no espera fija (RN-CI-03): un CI intermitente entrena al equipo a
+      # reintentar en lugar de a investigar.
+      - name: Esperar a /health
+        if: steps.gate.outputs.ready == 'true'
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:5080/health > /dev/null; then
+              echo "La API respondio tras $i intento(s)."
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "La API no respondio en 30 intentos. Volcado de api.log:"
+          cat api.log
+          exit 1
+
+      - name: Verificar la tabla de aceptacion
+        if: steps.gate.outputs.ready == 'true'
+        run: |
+          curl -sf http://localhost:5080/api/v1/analysis/sample > sample.json
+
+          check() {
+            jq -e "$1" sample.json > /dev/null \
+              || { echo "FALLO: $2"; echo "Respuesta recibida:"; jq . sample.json; exit 1; }
+          }
+
+          check '.summary.totalRecords == 10'           'totalRecords deberia ser 10'
+          check '.summary.recordsRequiringReview == 3'  'recordsRequiringReview deberia ser 3'
+          check '.summary.highSeverity == 3'            'highSeverity deberia ser 3'
+          # La importante: las tres anteriores pasarian igual marcando tres registros equivocados.
+          check '[.results[] | select(.requiresReview) | .id] == [4,7,8]' \
+                'los registros marcados deberian ser exactamente el 4, el 7 y el 8'
+
+      - name: Parar la API
+        if: always() && steps.gate.outputs.ready == 'true'
+        run: |
+          if [ -f api.pid ]; then kill "$(cat api.pid)" 2>/dev/null || true; fi
