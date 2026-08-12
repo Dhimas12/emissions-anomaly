@@ -75,7 +75,7 @@ antes de empezar la siguiente. Marcar `[x]` al terminar.
   base de su sede (RN-01); con dos anomalías de distinta severidad el `reason`
   corresponde a la mayor; el desempate por prioridad funciona.
 
-- [ ] **T11 · Tests de aceptación** — todos
+- [x] **T11 · Tests de aceptación** — todos
   `AcceptanceTests` sobre el dataset del enunciado, comprobando **registro a
   registro** la tabla de `001` §6 y el resumen agregado.
   Incluir `ADR01_MediaYDesviacionTipicaEnmascararianElAtipico` como test de
