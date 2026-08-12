@@ -216,6 +216,19 @@ public interface IAnomalyDetectionEngine
     AnalysisResult Analyze(IReadOnlyList<EmissionRecord> records);
 }
 
+// Agrupación por sede (fase 2 de `002` §1). La clave ignora mayúsculas y espacios
+// sobrantes: "Madrid", "MADRID" y " Madrid " caen en la misma SiteHistory. Cuando un lote
+// se compone de dos fuentes, la misma sede llega escrita de dos formas, y agrupar por
+// igualdad ordinal partiría su histórico en dos: cada mitad caería por debajo de
+// MinimumBaselineSize, las reglas estadísticas devolverían NotEvaluated y un duplicado de
+// periodo con distinta capitalización pasaría desapercibido. Los tres fallos son
+// silenciosos, que es la peor forma de fallar en esta entrega.
+//
+// SiteHistory.Site conserva la primera grafía tal y como llegó, para que la salida muestre
+// lo que envió el origen y no una forma normalizada que el analista no reconocería.
+//
+// Se implementa y se prueba en T10, que es donde vive la agrupación.
+
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddAnomalyDetection(this IServiceCollection services,
