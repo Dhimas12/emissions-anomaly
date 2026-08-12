@@ -56,6 +56,8 @@ emissions-anomaly/
 └── tests/
     └── Emissions.Analysis.Tests/
         ├── Emissions.Analysis.Tests.csproj
+        ├── EmissionRecordTests.cs
+        ├── RuleEvaluationTests.cs
         ├── RobustStatisticsTests.cs
         ├── AnomalyDetectionOptionsTests.cs
         ├── SiteHistoryTests.cs
@@ -124,7 +126,9 @@ namespace Emissions.Domain;
 public sealed record EmissionRecord(
     int Id, string? Site, string? Month, double? EnergyKwh, double? Co2Kg)
 {
-    // Null si no es calculable (energía nula, cero o negativa).
+    // Null si no es calculable, que son cuatro casos: `EnergyKwh` ausente, cero o
+    // negativa —sin divisor válido no hay cociente que signifique nada— y `Co2Kg`
+    // ausente, porque un numerador que falta no es lo mismo que un numerador cero.
     public double? CarbonIntensity { get; }
 }
 
