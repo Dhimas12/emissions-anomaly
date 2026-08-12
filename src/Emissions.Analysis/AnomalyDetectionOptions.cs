@@ -8,6 +8,10 @@ namespace Emissions.Analysis;
 // silenciosamente equivocado que acaba en un informe ESG publicado.
 public sealed class AnomalyDetectionOptions : IValidatableObject
 {
+    // Nombre de la sección en appsettings.json. Como constante para que el enlace y la
+    // configuración no puedan separarse por una errata en una cadena suelta.
+    public const string SectionName = "AnomalyDetection";
+
     // ADR-01: umbral convencional del z-score modificado de Iglewicz–Hoaglin.
     [Range(0.0, double.MaxValue, MinimumIsExclusive = true)]
     public double RobustZScoreThreshold { get; set; } = 3.5;
