@@ -72,6 +72,20 @@ emissions-anomaly/
         └── SampleDatasetTests.cs       (humo de T0, exigido por 006 T-CI-2)
 ```
 
+### `launchSettings.json` y `ASPNETCORE_URLS` tienen que decir lo mismo
+
+`applicationUrl` es `http://+:5080`, no `http://localhost:5080`, y coincide a propósito con
+el `ASPNETCORE_URLS` que declara el `Dockerfile`.
+
+El motivo es una precedencia que no es obvia: **el perfil de lanzamiento gana sobre la
+variable de entorno**. Con `applicationUrl` en `localhost`, `dotnet run` dentro del
+contenedor hacía que Kestrel escuchase solo en el loopback interno, el proxy de Docker
+aceptaba la conexión sin nadie detrás, y desde el host cada `curl` devolvía
+`Empty reply from server` — un síntoma que no apunta a su causa. La variable del
+`Dockerfile` existe justo para evitarlo y quedaba anulada en silencio.
+
+Si alguien cambia uno de los dos valores, tiene que cambiar el otro.
+
 ### `global.json`
 
 Fija la banda del SDK 8 con `rollForward: latestFeature`. No es adorno: en una máquina
