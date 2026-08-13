@@ -22,9 +22,17 @@ curl -s localhost:5080/api/v1/analysis/sample | jq '.summary'
 Swagger UI en `http://localhost:5080/`, sonda en `/health`, y `POST /api/v1/analysis`
 acepta `?onlyFlagged=true`.
 
-> Si el puerto 5080 devuelve `Empty reply from server`, el contenedor de `docker-compose`
-> está levantado y lo tiene publicado: los `curl` llegan a su proxy, no a Kestrel. Bájalo o
-> usa `--urls` con otro puerto.
+> **Si el puerto 5080 devuelve `Empty reply from server`**, el contenedor de
+> `docker-compose` está levantado y lo tiene publicado: los `curl` llegan a su proxy, no a
+> Kestrel. Bájalo con `docker compose down` o usa `--urls` con otro puerto.
+>
+> **La primera ejecución en Windows puede abrir el aviso del cortafuegos.** La API escucha
+> en todas las interfaces (`http://+:5080`) para que también funcione dentro del contenedor;
+> hay que permitirlo, o el host no llegará a Kestrel.
+>
+> **No alternes entre compilar en Windows y compilar en el contenedor sin borrar `bin/` y
+> `obj/`.** Los artefactos quedan con propietario distinto y el build falla con
+> `error MSB3374: Access to the path ... is denied`.
 
 `Dockerfile` y `docker-compose.yml` son **entorno de desarrollo**, no parte de la solución.
 
